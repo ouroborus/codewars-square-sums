@@ -22,7 +22,6 @@ class Task(threading.Thread):
                 q.put('die')
                 break
             sleep(0.1)
-        #print("** Ending {}".format(self._name))
         thread.join()
 
     def kill(self):
@@ -33,7 +32,6 @@ class Task(threading.Thread):
         pipe = proc.stdout
         line = pipe.readline()
         while line:
-            #print('--', self._name, line, end='')
             q_out.put((name, line))
             try:
                 if q_in.get(timeout=0):
@@ -46,9 +44,8 @@ class Task(threading.Thread):
 
 
 def do_processing(n, task_limit):
-    target = '/home/ouroborus/.vs/hamiltonian/workspace/out/build/linux-gcc-debug/hamiltonian'
+    target = 'hamiltonian'
     tasks = {}
-    #old_threads = []
     if task_limit > n:
         task_limit = n
     jobs = list([str(j) for j in range(1, n+1)])
@@ -60,7 +57,6 @@ def do_processing(n, task_limit):
         print('Starting task: {}, limit: {}'.format(j, backtrack_limit))
         task = Task(j, q, target, args=(n, j))
         tasks[j] = [j, task] # job, task
-        #print('**',tasks)
         task.deamon = True
         task.start()
     def kill(task):
@@ -104,7 +100,6 @@ def do_processing(n, task_limit):
                     args += (backtrack_limit,)
                 task = Task(j, q, target, args=args)
                 tasks[j] = [j, task]
-                #print('**',tasks)
                 task.deamon = True
                 task.start()
             
@@ -115,13 +110,6 @@ def do_processing(n, task_limit):
             sleep(0.1)
     
     print('Results: N:{}, Task: {}, Backtrack: {}'.format(n, backtrack_task, backtrack_limit))
-
-    #print(tasks)
-    #print(old_threads)
-    #for thread in old_threads:
-    #    print(thread, thread.is_alive())
-    #    thread.kill()
-    #    thread.join()
 
 def main():
     parser = argparse.ArgumentParser(description='Do the thing.')
